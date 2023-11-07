@@ -62,6 +62,24 @@ class Spacecraft:
 
     # Move method
     def move(self, planet=None):
+        # Calculating the Gravitational Force
+        # Calculate the distance between ourselves and the planet
+        distance = math.sqrt((self.x - planet.x)**2 + (self.y - planet.y)**2)
+        # Force
+        force = (G *self.mass * planet.mass) / distance ** 2
+        # Acceleration
+        acceleration = force / self.mass
+        # Angle thata
+        # In this order because this will give us the correct direction 
+        angle = math.atan2(planet.y - self.y, planet.x - self.x)
+        # Acceleration in both directions
+        acceleration_x = acceleration * math.cos(angle)
+        acceleration_y = acceleration * math.sin(angle)
+
+        # Velocity for x direction and y direction
+        self.x_vel += acceleration_x
+        self.y_vel += acceleration_y
+        # We take whatever our new velocity is and we are applying that to our x and to our y
         self.x += self.x_vel
         self.y += self.y_vel
 
@@ -134,11 +152,16 @@ def main():
         # [:] makes a copy of this list so when the list is ammened it amends the copy and does effect the iteration of the original list
         for obj in objects[:]:
             obj.draw()
-            obj.move()
+            obj.move(planet)
             # to remove objects once off the screen
             off_screen = obj.x < 0 or obj.x > WIDTH or obj.y < 0 or obj.y > HEIGHT
+
             # Planet collision
-            if off_screen:
+            # The distance between two points formula
+            # Square route of the x coordinates plus the y coordinates is less than or equal to planet size
+            collided = math.sqrt((obj.x - planet.x)**2 + (obj.y - planet.y)**2) <= planet_size
+
+            if off_screen or collided:
                 objects.remove(obj)
 
         planet.draw()
